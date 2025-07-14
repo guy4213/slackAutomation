@@ -43,4 +43,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 ENV PYTHONUNBUFFERED=1
 
 # הפעלת האפליקציה
-CMD ["python", "flask_app.py"]
+CMD ["gunicorn", "flask_app:app", "--bind", "0.0.0.0:5000", "--timeout", "300"]

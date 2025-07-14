@@ -3,3 +3,4 @@ undetected-chromedriver
 flask
 flask-cors
 python-dotenv
+gunicorn
