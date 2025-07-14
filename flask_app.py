@@ -399,16 +399,16 @@ def status():
     return jsonify({"status": "running", "ok": True})
 
 # Start the Flask application
-if __name__ == '__main__':
-    logger.info("Starting Flask server on 0.0.0.0:5000")
-    print("Server is running at http://0.0.0.0:5000")
-    print("Your local IP addresses:")
+# if __name__ == '__main__':
+#     logger.info("Starting Flask server on 0.0.0.0:5000")
+#     print("Server is running at http://0.0.0.0:5000")
+#     print("Your local IP addresses:")
     
-    # Show available IP addresses to help with configuration
-    import socket
-    hostname = socket.gethostname()
-    ip_list = socket.gethostbyname_ex(hostname)[2]
-    for ip in ip_list:
-        print(f"  http://{ip}:5000")
+#     # Show available IP addresses to help with configuration
+#     import socket
+#     hostname = socket.gethostname()
+#     ip_list = socket.gethostbyname_ex(hostname)[2]
+#     for ip in ip_list:
+#         print(f"  http://{ip}:5000")
     
-    app.run(host='0.0.0.0', port=5000)
+#     app.run(host='0.0.0.0', port=5000)
