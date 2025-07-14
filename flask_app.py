@@ -30,8 +30,9 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app)  # Enable Cross-Origin Resource Sharing
 
-# Load saved session cookies (if available)
-COOKIES_FILE = "slack_cookies.pkl"
+# Load saved session cookies (if available)Q
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+COOKIES_FILE = os.path.join(BASE_DIR, "slack_cookies.pkl")
 
 # Function to perform Slack invitation
 def invite_emails(emails,channelsNames,isMember,className):
@@ -56,6 +57,8 @@ def invite_emails(emails,channelsNames,isMember,className):
         # Load cookies to avoid re-login
         if os.path.exists(COOKIES_FILE):
             try:
+                logger.info(f"Looking for cookies in: {COOKIES_FILE}")
+                logger.info(f"File exists? {os.path.exists(COOKIES_FILE)}")
                 with open(COOKIES_FILE, "rb") as f:
                     cookies = pickle.load(f)
                     for cookie in cookies:
@@ -387,6 +390,9 @@ def invite():
         import traceback
         logger.error(traceback.format_exc())
         return jsonify({"error": str(e), "ok": False}), 500
+
+
+        
 # Status endpoint to check if server is running
 @app.route('/status', methods=['GET'])
 def status():
