@@ -3,3 +3,4 @@ flask-cors
 undetected-chromedriver
 selenium
 python-dotenv
+packaging
