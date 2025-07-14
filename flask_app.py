@@ -411,4 +411,4 @@ if __name__ == '__main__':
     for ip in ip_list:
         print(f"  http://{ip}:5000")
     
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000)
