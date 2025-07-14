@@ -1,6 +1,5 @@
+selenium
+undetected-chromedriver
 flask
 flask-cors
-undetected-chromedriver
-selenium
 python-dotenv
-packaging
