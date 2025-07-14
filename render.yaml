@@ -1,0 +1,5 @@
+services:
+  - type: web
+    name: flask_app
+    env: python
+    pythonVersion: "3.11"
