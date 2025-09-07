@@ -48,7 +48,7 @@ def invite_emails(emails,channelsNames,isMember,className):
     driver = uc.Chrome(options=options)
     driver.maximize_window()
     logger.info(f"className is {className}")
-    try:#
+    try:##
         # Open Slack login page
         driver.get("https://iaccollege.slack.com")
         logger.info("Opened Slack login page")
