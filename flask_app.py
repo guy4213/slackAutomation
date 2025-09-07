@@ -14,7 +14,6 @@ from dotenv import load_dotenv # Import load_dotenv
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from flask import Flask, request, jsonify
 from flask_cors import CORS 
-from multiprocessing import Process
 
 # Set up logging
 logging.basicConfig(
@@ -31,21 +30,20 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app)  # Enable Cross-Origin Resource Sharing
 
-# Load saved session cookies (if available)Q
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-COOKIES_FILE = os.path.join(BASE_DIR, "slack_cookies.pkl")
+# Load saved session cookies (if available)
+COOKIES_FILE = "slack_cookies.pkl"
 
 # Function to perform Slack invitation
 def invite_emails(emails,channelsNames,isMember,className):
     logger.info(f"Starting invitation process for: {emails}")
     # Setup Chrome driver (undetected to avoid bot detection)
     options = uc.ChromeOptions()
-    options.add_argument("--headless=new")            # Headless mode (Chromium >= 109)
+    # options.add_argument("--headless=new")            # Headless mode (Chromium >= 109)
     options.add_argument("--no-sandbox")               # Required in many Linux containers
     options.add_argument("--disable-dev-shm-usage")    # Prevents /dev/shm issues
     options.add_argument("--disable-gpu")              # Disable GPU if any issues
     options.add_argument("--window-size=1920,1080")  
-    options.binary_location = "/usr/bin/google-chrome"  # חשוב! עבור Render
+    # options.binary_location = "/usr/bin/google-chrome"  # חשוב! עבור Render
   # Optional: set window size
     driver = uc.Chrome(options=options)
     driver.maximize_window()
@@ -58,8 +56,6 @@ def invite_emails(emails,channelsNames,isMember,className):
         # Load cookies to avoid re-login
         if os.path.exists(COOKIES_FILE):
             try:
-                logger.info(f"Looking for cookies in: {COOKIES_FILE}")
-                logger.info(f"File exists? {os.path.exists(COOKIES_FILE)}")
                 with open(COOKIES_FILE, "rb") as f:
                     cookies = pickle.load(f)
                     for cookie in cookies:
@@ -330,68 +326,6 @@ def send_zoho_email(email_address, class_name):
         return f"Error: Failed to send email to Zoho: {e}"
 
 # REST endpoint for the POST request with improved error handling
-# @app.route('/invite', methods=['POST'])
-# def invite():
-#     logger.info(f"Received invitation request from {request.remote_addr}")
-    
-#     try:
-#         # Get JSON data from the request body
-#         data = request.get_json()
-#         logger.info(f"Request data: {data}")
-        
-#         # Check for missing required fields
-#         if not data:
-#             logger.warning("No data received in request")
-#             return jsonify({"error": "No JSON data provided in the request body.", "ok": False}), 400
-
-#         required_fields = ['emails', 'channelsNames', 'isMember', 'className']
-#         for field in required_fields:
-#             if field not in data:
-#                 logger.warning(f"Missing '{field}' field in request")
-#                 return jsonify({"error": f"Missing '{field}' field in the request body.", "ok": False}), 400
-        
-#         emails = data['emails']
-#         channelsNames = data['channelsNames']
-#         isMember = data['isMember']
-#         className = data['className']
-        
-#         # Check if emails and className are strings
-#         if not isinstance(emails, str) or not isinstance(className, str):
-#             logger.warning("Invalid input: 'emails' or 'className' is not a string.")
-#             return jsonify({"error": "'emails' and 'className' must be strings.", "ok": False}), 400
-
-#         logger.info(f"Processing Slack invitation for: {emails}")
-        
-#         # Call the function to send Slack invitations
-#         slack_result = invite_emails(emails, channelsNames, isMember, className)
-#         logger.info(f"Slack invitation result: {slack_result}")
-        
-#         zoho_api_res = "Not a single email, Zoho call skipped."
-        
-#         # --- כאן מבצעים את הבדיקה והשליחה ל-ZOHO ---
-#         trimmed_emails = emails.strip()
-#         # Check if the emails string is a single email (no common delimiters)
-#         if not (',' in trimmed_emails or ';' in trimmed_emails or ' ' in trimmed_emails):
-#             if trimmed_emails: # Make sure it's not an empty string
-#                 logger.info(f"Detected single email '{trimmed_emails}'. Processing ZOHO request.")
-#                 # קריאה לפונקציית המייל החדשה
-#                 zoho_api_res = send_zoho_email(email_address=trimmed_emails, class_name=className)
-#             else:
-#                 zoho_api_res = "Email string was empty, Zoho call skipped."
-
-
-#         return jsonify({
-#             "slack_message": slack_result,
-#             "zoho_message": zoho_api_res,
-#             "ok": True
-#         })
-    
-#     except Exception as e:
-#         logger.error(f"Error processing invitation: {str(e)}")
-#         import traceback
-#         logger.error(traceback.format_exc())
-#         return jsonify({"error": str(e), "ok": False}), 500
-
 @app.route('/invite', methods=['POST'])
 def invite():
     logger.info(f"Received invitation request from {request.remote_addr}")
@@ -401,6 +335,7 @@ def invite():
         data = request.get_json()
         logger.info(f"Request data: {data}")
         
+        # Check for missing required fields
         if not data:
             logger.warning("No data received in request")
             return jsonify({"error": "No JSON data provided in the request body.", "ok": False}), 400
@@ -416,43 +351,44 @@ def invite():
         isMember = data['isMember']
         className = data['className']
         
+        # Check if emails and className are strings
         if not isinstance(emails, str) or not isinstance(className, str):
             logger.warning("Invalid input: 'emails' or 'className' is not a string.")
             return jsonify({"error": "'emails' and 'className' must be strings.", "ok": False}), 400
 
         logger.info(f"Processing Slack invitation for: {emails}")
         
-        # 🔁 הרצת הקריאה לסלאק בתהליך נפרד
-        def run_slack_invite():
-            try:
-                invite_emails(emails, channelsNames, isMember, className)
-            except Exception as e:
-                logger.error(f"Slack invite failed in subprocess: {e}")
-
-        Process(target=run_slack_invite).start()
-
-        # שליחת מייל ל-Zoho אם צריך
+        # Call the function to send Slack invitations
+        slack_result = invite_emails(emails, channelsNames, isMember, className)
+        logger.info(f"Slack invitation result: {slack_result}")
+        
         zoho_api_res = "Not a single email, Zoho call skipped."
+        
+        # --- כאן מבצעים את הבדיקה והשליחה ל-ZOHO ---
         trimmed_emails = emails.strip()
-
+        # Check if the emails string is a single email (no common delimiters)
         if not (',' in trimmed_emails or ';' in trimmed_emails or ' ' in trimmed_emails):
-            if trimmed_emails:
+            if trimmed_emails: # Make sure it's not an empty string
                 logger.info(f"Detected single email '{trimmed_emails}'. Processing ZOHO request.")
+                # קריאה לפונקציית המייל החדשה
                 zoho_api_res = send_zoho_email(email_address=trimmed_emails, class_name=className)
             else:
                 zoho_api_res = "Email string was empty, Zoho call skipped."
 
+
         return jsonify({
-            "slack_message": "Slack invitation started in background.",
+            "slack_message": slack_result,
             "zoho_message": zoho_api_res,
             "ok": True
         })
-
+    
     except Exception as e:
         logger.error(f"Error processing invitation: {str(e)}")
         import traceback
         logger.error(traceback.format_exc())
         return jsonify({"error": str(e), "ok": False}), 500
+
+
         
 # Status endpoint to check if server is running
 @app.route('/status', methods=['GET'])
@@ -460,16 +396,16 @@ def status():
     return jsonify({"status": "running", "ok": True})
 
 # Start the Flask application
-# if __name__ == '__main__':
-#     logger.info("Starting Flask server on 0.0.0.0:5000")
-#     print("Server is running at http://0.0.0.0:5000")
-#     print("Your local IP addresses:")
+if __name__ == '__main__':
+    logger.info("Starting Flask server on 0.0.0.0:5000")
+    print("Server is running at http://0.0.0.0:5000")
+    print("Your local IP addresses:")
     
-#     # Show available IP addresses to help with configuration
-#     import socket
-#     hostname = socket.gethostname()
-#     ip_list = socket.gethostbyname_ex(hostname)[2]
-#     for ip in ip_list:
-#         print(f"  http://{ip}:5000")
+    # Show available IP addresses to help with configuration
+    import socket
+    hostname = socket.gethostname()
+    ip_list = socket.gethostbyname_ex(hostname)[2]
+    for ip in ip_list:
+        print(f"  http://{ip}:5000")
     
-#     app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
