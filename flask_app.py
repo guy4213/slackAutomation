@@ -38,12 +38,12 @@ def invite_emails(emails,channelsNames,isMember,className):
     logger.info(f"Starting invitation process for: {emails}")
     # Setup Chrome driver (undetected to avoid bot detection)
     options = uc.ChromeOptions()
-    # options.add_argument("--headless=new")            # Headless mode (Chromium >= 109)
+    options.add_argument("--headless=new")            # Headless mode (Chromium >= 109)
     options.add_argument("--no-sandbox")               # Required in many Linux containers
     options.add_argument("--disable-dev-shm-usage")    # Prevents /dev/shm issues
     options.add_argument("--disable-gpu")              # Disable GPU if any issues
     options.add_argument("--window-size=1920,1080")  
-    # options.binary_location = "/usr/bin/google-chrome"  # חשוב! עבור Render
+    options.binary_location = "/usr/bin/google-chrome"  # חשוב! עבור Render
   # Optional: set window size
     driver = uc.Chrome(options=options)
     driver.maximize_window()
@@ -396,16 +396,22 @@ def status():
     return jsonify({"status": "running", "ok": True})
 
 # Start the Flask application
+# if __name__ == '__main__':
+#     logger.info("Starting Flask server on 0.0.0.0:5000")
+#     print("Server is running at http://0.0.0.0:5000")
+#     print("Your local IP addresses:")
+    
+#     # Show available IP addresses to help with configuration
+#     import socket
+#     hostname = socket.gethostname()
+#     ip_list = socket.gethostbyname_ex(hostname)[2]
+#     for ip in ip_list:
+#         print(f"  http://{ip}:5000")
+    
+#     app.run(host='0.0.0.0', port=5000, debug=True)
+
 if __name__ == '__main__':
-    logger.info("Starting Flask server on 0.0.0.0:5000")
-    print("Server is running at http://0.0.0.0:5000")
-    print("Your local IP addresses:")
+    port = int(os.environ.get('PORT', 5000))  # Railway מגדיר PORT אוטומטית
+    logger.info(f"Starting Flask server on 0.0.0.0:{port}")
     
-    # Show available IP addresses to help with configuration
-    import socket
-    hostname = socket.gethostname()
-    ip_list = socket.gethostbyname_ex(hostname)[2]
-    for ip in ip_list:
-        print(f"  http://{ip}:5000")
-    
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=False)  # debug=False בפרודקשן!
