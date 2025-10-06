@@ -207,7 +207,7 @@ def invite_emails(emails,channelsNames,isMember,className):
         if  isMember=="false":
             try:
                 typeUser_button = driver.find_element(By.XPATH, typeUser_selector)
-                driver.execute_script("arguments[0].click();", typeUser_button)    
+                typeUser_button.click()
                 logger.info("Clicked typeUser_button button")
             except Exception as e:
                 logger.error(f"Error clicking 'typeUser_button': {e}")
@@ -248,13 +248,13 @@ def invite_emails(emails,channelsNames,isMember,className):
                     
                 # Log success
                 logger.info( "Entered channel name into the input field." )
-                time.sleep(1)       
+
             except Exception as e:
                 logger.error(f"Error interacting with 'channels_inp': {e}")
             
         else:
             try:
-                 
+                    
                 customizeButton = driver.find_element(By.XPATH, customizeButton_selector)
                 customizeButton.click()
                 logger.info("Clicked customizeButton button")
@@ -288,7 +288,7 @@ def invite_emails(emails,channelsNames,isMember,className):
                     
                 # Log success
                 logger.info("Entered channel name into the input field.")
-                time.sleep(1)
+
             except Exception as e:
                 logger.error(f"Error interacting with 'channels_inp_member_Section': {e}")         
                 
