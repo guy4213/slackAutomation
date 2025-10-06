@@ -63,7 +63,7 @@ def invite_emails(emails,channelsNames,isMember,className):
     options.add_argument("--disable-dev-shm-usage")    # Prevents /dev/shm issues
     options.add_argument("--disable-gpu")              # Disable GPU if any issues
     options.add_argument("--window-size=1920,1080")  
-    # options.binary_location = "/usr/bin/google-chrome"  # חשוב! עבור Render
+    options.binary_location = "/usr/bin/google-chrome"  # חשוב! עבור Render
   # Optional: set window size
     driver = uc.Chrome(options=options, version_main=140)  
     driver.maximize_window()
