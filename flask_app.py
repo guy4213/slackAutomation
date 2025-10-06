@@ -92,9 +92,9 @@ def invite_emails(emails,channelsNames,isMember,className):
                 driver.save_screenshot("debug_after_cookies.png")
                 logger.info("Saved screenshot as debug_after_cookies.png")
           # <<< סוף קוד הדיבאגינג >>>
-                if 'signin' in debug_url or 'login' in debug_url:
-                    logger.error("Cookie login failed! The browser is on the login page.")
-                raise Exception("Cookie authentication failed.")
+                # if 'signin' in debug_url or 'login' in debug_url:
+                #     logger.error("Cookie login failed! The browser is on the login page.")
+                # # raise Exception("Cookie authentication failed.")
             except Exception as e:
                 logger.error(f"Error loading cookies: {e}")
         else:
@@ -108,8 +108,20 @@ def invite_emails(emails,channelsNames,isMember,className):
             logger.info("Saved session cookies for future logins.")
 
         # Navigate to admin page
-        driver.get("https://iaccollege.slack.com/admin/invites")
-        logger.info("Navigated to admin invites page")
+        admin_url = "https://iaccollege.slack.com/admin/invites"
+        driver.get(admin_url)
+        logger.info(f"Attempting to navigate to admin invites page: {admin_url}")
+        time.sleep(4) # המתנה של 4 שניות כדי לתת לדף להיטען במלואו
+    
+        final_url = driver.current_url
+        logger.info(f"URL after navigating to admin page is: {final_url}")
+        
+        screenshot_path = "admin_page_final_view.png"
+        driver.save_screenshot(screenshot_path)
+        logger.info(f"CRITICAL EVIDENCE screenshot saved to: {screenshot_path}")
+
+
+
 
         wait = WebDriverWait(driver, 15)
 
