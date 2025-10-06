@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: slack-inviter
+    env: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: SLACK_COOKIES_BASE64
+        sync: false
+      - key: ZOHO_SENDER_EMAIL
+        sync: false
+      - key: ZOHO_SENDER_PASSWORD
+        sync: false

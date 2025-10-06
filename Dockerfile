@@ -1,6 +1,5 @@
 FROM python:3.11-slim
 
-# התקנות בסיס
 RUN apt-get update && apt-get install -y \
     wget \
     unzip \
@@ -27,20 +26,20 @@ RUN apt-get update && apt-get install -y \
     libvulkan1 \
     && rm -rf /var/lib/apt/lists/*
 
-# התקנת Chrome (גרסה יציבה)
-RUN curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o chrome.deb && \
-    apt install -y ./chrome.deb && \
-    rm chrome.deb
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list && \
+    apt-get update && \
+    apt-get install -y google-chrome-stable && \
+    rm -rf /var/lib/apt/lists/*
 
-# העתקת קבצי האפליקציה
 WORKDIR /app
-COPY . .
 
-# התקנת תלויות Python
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# הגדרת משתנים חשובים
-ENV PYTHONUNBUFFERED=1
+COPY . .
 
-# הפעלת האפליקציה
-CMD ["gunicorn", "flask_app:app", "--bind", "0.0.0.0:5000", "--timeout", "600", "--workers=1", "--threads=4"]
+ENV PYTHONUNBUFFERED=1
+ENV PORT=5000
+
+CMD gunicorn flask_app:app --bind 0.0.0.0:$PORT --timeout 600 --workers 1

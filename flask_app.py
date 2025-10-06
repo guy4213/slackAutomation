@@ -14,7 +14,25 @@ from dotenv import load_dotenv # Import load_dotenv
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from flask import Flask, request, jsonify
 from flask_cors import CORS 
+import base64
 
+# הוסף את זה אחרי ה-imports
+def load_cookies_from_env():
+    """טוען cookies ממשתני סביבה אם קובץ לא קיים"""
+    if os.path.exists("slack_cookies.pkl"):
+        logger.info("Using local cookies file")
+        return
+    
+    cookies_b64 = os.environ.get('SLACK_COOKIES_BASE64')
+    if cookies_b64:
+        try:
+            import pickle
+            cookies_data = base64.b64decode(cookies_b64)
+            with open("slack_cookies.pkl", "wb") as f:
+                f.write(cookies_data)
+            logger.info("Loaded cookies from environment variable")
+        except Exception as e:
+            logger.error(f"Failed to load cookies from env: {e}")
 # Set up logging
 logging.basicConfig(
     level=logging.INFO,
@@ -35,7 +53,9 @@ COOKIES_FILE = "slack_cookies.pkl"
 
 # Function to perform Slack invitation
 def invite_emails(emails,channelsNames,isMember,className):
+
     logger.info(f"Starting invitation process for: {emails}")
+    load_cookies_from_env()
     # Setup Chrome driver (undetected to avoid bot detection)
     options = uc.ChromeOptions()
     options.add_argument("--headless=new")            # Headless mode (Chromium >= 109)
@@ -43,9 +63,9 @@ def invite_emails(emails,channelsNames,isMember,className):
     options.add_argument("--disable-dev-shm-usage")    # Prevents /dev/shm issues
     options.add_argument("--disable-gpu")              # Disable GPU if any issues
     options.add_argument("--window-size=1920,1080")  
-    options.binary_location = "/usr/bin/google-chrome"  # חשוב! עבור Render
+    # options.binary_location = "/usr/bin/google-chrome"  # חשוב! עבור Render
   # Optional: set window size
-    driver = uc.Chrome(options=options)
+    driver = uc.Chrome(options=options, version_main=140)  
     driver.maximize_window()
     logger.info(f"className is {className}")
     try:##
