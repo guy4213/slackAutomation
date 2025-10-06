@@ -248,13 +248,13 @@ def invite_emails(emails,channelsNames,isMember,className):
                     
                 # Log success
                 logger.info( "Entered channel name into the input field." )
-
+                time.sleep(1)       
             except Exception as e:
                 logger.error(f"Error interacting with 'channels_inp': {e}")
             
         else:
             try:
-                    
+                 
                 customizeButton = driver.find_element(By.XPATH, customizeButton_selector)
                 customizeButton.click()
                 logger.info("Clicked customizeButton button")
@@ -288,7 +288,7 @@ def invite_emails(emails,channelsNames,isMember,className):
                     
                 # Log success
                 logger.info("Entered channel name into the input field.")
-
+                time.sleep(1)
             except Exception as e:
                 logger.error(f"Error interacting with 'channels_inp_member_Section': {e}")         
                 
