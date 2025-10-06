@@ -207,7 +207,7 @@ def invite_emails(emails,channelsNames,isMember,className):
         if  isMember=="false":
             try:
                 typeUser_button = driver.find_element(By.XPATH, typeUser_selector)
-                typeUser_button.click()
+                driver.execute_script("arguments[0].click();", typeUser_button)    
                 logger.info("Clicked typeUser_button button")
             except Exception as e:
                 logger.error(f"Error clicking 'typeUser_button': {e}")
