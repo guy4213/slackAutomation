@@ -85,6 +85,16 @@ def invite_emails(emails,channelsNames,isMember,className):
                             logger.warning(f"Cookie error: {e}")
                 driver.refresh()
                 logger.info("Loaded session cookies to bypass login.")
+        # <<< הוסף את קוד הדיבאגינג כאן >>>
+                time.sleep(3) # תן לדף שנייה להתייצב
+                debug_url = driver.current_url
+                logger.info(f"URL after loading cookies and refreshing is: {debug_url}")
+                driver.save_screenshot("debug_after_cookies.png")
+                logger.info("Saved screenshot as debug_after_cookies.png")
+          # <<< סוף קוד הדיבאגינג >>>
+                if 'signin' in debug_url or 'login' in debug_url:
+                    logger.error("Cookie login failed! The browser is on the login page.")
+                raise Exception("Cookie authentication failed.")
             except Exception as e:
                 logger.error(f"Error loading cookies: {e}")
         else:
